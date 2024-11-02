@@ -22,9 +22,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_layer();
 
     io.ns("/", |s: SocketRef| {
-        s.on("drawing", |s: SocketRef, Data::<Value>(data)| {
+        s.on("draw", |s: SocketRef, Data::<Value>(data)| {
             info!("drawing event!");
-            s.broadcast().emit("drawing", &data).unwrap();});
+            s.broadcast().emit("draw", &data).unwrap();});
         });
 
     let app = axum::Router::new()

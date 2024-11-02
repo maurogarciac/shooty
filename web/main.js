@@ -12,6 +12,14 @@
   };
   var drawing = false;
 
+  // var bodyRect = document.body.getBoundingClientRect(),
+  //   elemRect = canvas.getBoundingClientRect(),
+  //   offset_top   = elemRect.top - bodyRect.top,
+  //   offset_left  = elemRect.left - bodyRect.left;
+  // console.log('Canvas is ' + offset_top + ' vertical pixels from <body>');
+  // console.log('Canvas is ' + offset_left + ' left pixels from <body>');
+
+
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
   canvas.addEventListener('mouseout', onMouseUp, false);
@@ -27,16 +35,21 @@
     colors[i].addEventListener('click', onColorUpdate, false);
   }
 
-  socket.on('drawing', onDrawingEvent);
+  socket.on('draw', onDrawingEvent);
 
-  // window.addEventListener('resize', onResize, false);
-  onResize();
+  canvas.width = 900;
+  canvas.height = 600;
 
 
   function drawLine(x0, y0, x1, y1, color, emit){
     context.beginPath();
-    context.moveTo(x0, y0);
-    context.lineTo(x1, y1);
+
+    // hard coded margin lmao
+    var margin_top = 65,
+      margin_left = 10 ;
+
+    context.moveTo(x0 - margin_left, y0 - margin_top);
+    context.lineTo(x1 - margin_left, y1 - margin_top);
     context.strokeStyle = color;
     context.lineWidth = 2;
     context.stroke();
@@ -46,7 +59,7 @@
     var w = canvas.width;
     var h = canvas.height;
 
-    socket.emit('drawing', {
+    socket.emit('draw', {
       x0: x0 / w,
       y0: y0 / h,
       x1: x1 / w,
@@ -57,6 +70,10 @@
 
   function onMouseDown(e){
     drawing = true;
+
+    console.log(e.clientX)
+    console.log(e.clientY)
+
     current.x = e.clientX||e.touches[0].clientX;
     current.y = e.clientY||e.touches[0].clientY;
   }
@@ -95,12 +112,6 @@
     var w = canvas.width;
     var h = canvas.height;
     drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
-  }
-
-  // make the canvas fill its parent
-  function onResize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
   }
 
 })();

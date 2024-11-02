@@ -11,24 +11,33 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
 /**
  * Canvas
  */
 
+#wrapper {
+  border: black;
+  border-style: solid;
+  margin-top: 48px;
+  border-width: 5px;
+  align-items: center;
+  width: 910px;
+  height: 610px;
+  margin: 60px 10px 10px 10px;
+}
+
 .whiteboard {
   height: 100%;
   width: 100%;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
 }
 
 .colors {
   position: fixed;
+  top: 0;
+  margin: 7px;
 }
 
 .color {
