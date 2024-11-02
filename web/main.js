@@ -2,20 +2,21 @@
 
 (function() {
 
-  var socket = io("http://localhost:4269");
-  var canvas = document.getElementsByClassName('whiteboard')[0];
-  var colors = document.getElementsByClassName('color');
-  var context = canvas.getContext('2d');
+  const socket = io("http://localhost:4269");
+  const canvas = document.getElementById('whiteboard');
+  const colors = document.getElementsByClassName('color');
+  const context = canvas.getContext('2d');
 
   var current = {
     color: 'black'
   };
   var drawing = false;
 
-  // var bodyRect = document.body.getBoundingClientRect(),
-  //   elemRect = canvas.getBoundingClientRect(),
-  //   offset_top   = elemRect.top - bodyRect.top,
-  //   offset_left  = elemRect.left - bodyRect.left;
+  // maybe make the offset be defined programatically instead of hardcoded
+  const bodyRect = document.body.getBoundingClientRect(),
+    elemRect = canvas.getBoundingClientRect(),
+    offset_top   = elemRect.top - bodyRect.top,
+    offset_left  = elemRect.left - bodyRect.left;
   // console.log('Canvas is ' + offset_top + ' vertical pixels from <body>');
   // console.log('Canvas is ' + offset_left + ' left pixels from <body>');
 
@@ -25,7 +26,7 @@
   canvas.addEventListener('mouseout', onMouseUp, false);
   canvas.addEventListener('mousemove', throttle(onMouseMove, 10), false);
   
-  //Touch support for mobile devices
+  // touch support for mobile devices
   canvas.addEventListener('touchstart', onMouseDown, false);
   canvas.addEventListener('touchend', onMouseUp, false);
   canvas.addEventListener('touchcancel', onMouseUp, false);
@@ -44,12 +45,8 @@
   function drawLine(x0, y0, x1, y1, color, emit){
     context.beginPath();
 
-    // hard coded margin lmao
-    var margin_top = 65,
-      margin_left = 10 ;
-
-    context.moveTo(x0 - margin_left, y0 - margin_top);
-    context.lineTo(x1 - margin_left, y1 - margin_top);
+    context.moveTo(x0 - offset_left, y0 - offset_top);
+    context.lineTo(x1 - offset_left, y1 - offset_top);
     context.strokeStyle = color;
     context.lineWidth = 2;
     context.stroke();
@@ -71,8 +68,8 @@
   function onMouseDown(e){
     drawing = true;
 
-    console.log(e.clientX)
-    console.log(e.clientY)
+    // console.log(e.clientX)
+    // console.log(e.clientY)
 
     current.x = e.clientX||e.touches[0].clientX;
     current.y = e.clientY||e.touches[0].clientY;

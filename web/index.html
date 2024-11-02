@@ -4,22 +4,23 @@
         <meta charset="UTF-8" />
         <title>Whiteboard</title>
         <link rel="stylesheet" href="style.css" />
+        <script src="https://cdn.socket.io/4.7.5/socket.io.msgpack.min.js"></script>
     </head>
 
     <body>
-        <div id="wrapper">
-            <canvas class="whiteboard"></canvas>
-        </div>
-
-        <div class="colors">
-            <div class="color black"></div>
-            <div class="color red"></div>
-            <div class="color green"></div>
-            <div class="color blue"></div>
-            <div class="color yellow"></div>
-        </div>
-
-        <script src="https://cdn.socket.io/4.7.5/socket.io.msgpack.min.js"></script>
+        <main>
+            <div id="whiteboard-wrapper">
+                <canvas id="whiteboard"></canvas>
+            </div>
+    
+            <div class="colors">
+                <div class="color black"></div>
+                <div class="color red"></div>
+                <div class="color green"></div>
+                <div class="color blue"></div>
+                <div class="color yellow"></div>
+            </div>
+        </main>
         <script src="main.js"></script>
     </body>
 </html>
