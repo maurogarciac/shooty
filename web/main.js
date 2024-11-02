@@ -19,6 +19,8 @@
     offset_left  = elemRect.left - bodyRect.left;
   // console.log('Canvas is ' + offset_top + ' vertical pixels from <body>');
   // console.log('Canvas is ' + offset_left + ' left pixels from <body>');
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
 
 
   canvas.addEventListener('mousedown', onMouseDown, false);
@@ -37,10 +39,6 @@
   }
 
   socket.on('draw', onDrawingEvent);
-
-  canvas.width = 900;
-  canvas.height = 600;
-
 
   function drawLine(x0, y0, x1, y1, color, emit){
     context.beginPath();
