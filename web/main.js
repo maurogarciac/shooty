@@ -384,25 +384,31 @@ class Ray {
 		
 		var tileHeight = 500 // wall render height
 
-		var alturaMuro = (tileHeight / this.distance) * this.proyectionPlaneDistance
+		var wallHeight = (tileHeight / this.distance) * this.proyectionPlaneDistance
 		
 		// calculate start and end of line, then draw it
-		var y0 = parseInt(canvasHeight/2) - parseInt(alturaMuro/2)
-		var y1 = y0 + alturaMuro
+		var y0 = parseInt(canvasHeight/2) - parseInt(wallHeight/2)
+		var y1 = y0 + wallHeight
 		var x = this.column
 		
 		// vary with camera height
 		
-		var velocidad = 0.2
-		var amplitud = 20
+		var speed = 0.2
+		var amplitude = 20
 		
-		var altura = 0
+		var height = 0
 		
 		var texturePixelHeight = 64 // draw textures
 		
 		var textureHeight = y0 - y1
 		ctx.imageSmoothingEnabled = false
-		ctx.drawImage(tiles,this.pixelTexture,((this.textureId -1 )*texturePixelHeight),this.pixelTexture,63,x,y1 + altura,1,textureHeight)	
+		ctx.drawImage(tiles,
+			this.pixelTexture,
+			((this.textureId -1 )*texturePixelHeight),
+			this.pixelTexture,
+			63, x, y1 + height,
+			1,
+			textureHeight)	
 		
 	}
 	
@@ -416,12 +422,12 @@ class Ray {
 		
 		if(viewMode == 1){
 			// direction line
-			var xDestino = this.wallHitX    
-			var yDestino = this.wallHitY	
+			var xDestination = this.wallHitX    
+			var yDestination = this.wallHitY	
 			
 			this.ctx.beginPath()
 			this.ctx.moveTo(this.x, this.y)
-			this.ctx.lineTo(xDestino, yDestino)
+			this.ctx.lineTo(xDestination, yDestination)
 			this.ctx.strokeStyle = "red"
 			this.ctx.stroke()
 		}
@@ -551,12 +557,12 @@ class Player{
 			
 			
 			// line parallel to player view
-			var xDestino = this.x + Math.cos(this.rotationAngle) * 40
-			var yDestino = this.y + Math.sin(this.rotationAngle) * 40	
+			var xDestination = this.x + Math.cos(this.rotationAngle) * 40
+			var yDestination = this.y + Math.sin(this.rotationAngle) * 40	
 			
 			this.ctx.beginPath()
 			this.ctx.moveTo(this.x, this.y)
-			this.ctx.lineTo(xDestino, yDestino)
+			this.ctx.lineTo(xDestination, yDestination)
 			this.ctx.strokeStyle = "#FFFFFF"
 			this.ctx.stroke()
 		}
@@ -577,7 +583,6 @@ class Sprite{
 		this.angle  = 0
 		
 		this.visible = false
-		
 	}
 
 	// calculate angle based on player
@@ -585,22 +590,19 @@ class Sprite{
 		var vectX = this.x - player.x
 		var vectY = this.y - player.y
 		
-
 		var playerAngleObjeto = Math.atan2(vectY, vectX)
-		var diferenciaangle = player.rotationAngle - playerAngleObjeto
+		var angleDifference = player.rotationAngle - playerAngleObjeto
+		
+		if (angleDifference < -3.14159)
+			angleDifference += 2.0 * 3.14159
+		if (angleDifference > 3.14159)
+			angleDifference -= 2.0 * 3.14159
 		
 		
-		
-		if (diferenciaangle < -3.14159)
-			diferenciaangle += 2.0 * 3.14159
-		if (diferenciaangle > 3.14159)
-			diferenciaangle -= 2.0 * 3.14159
-		
-		
-		diferenciaangle = Math.abs(diferenciaangle)
+		angleDifference = Math.abs(angleDifference)
 		
 
-		if(diferenciaangle < FOV_medio)
+		if(angleDifference < FOV_medio)
 			this.visible = true
 		else
 			this.visible = false
@@ -663,14 +665,14 @@ class Sprite{
 
 			// draw sprite column to column to prevent it from being visible behind a wall
 			
-			for(let i=0; i< texturePixelWidth; i++){
-				for(let j=0; j<columnWidth; j++){
+			for(let i=0; i < texturePixelWidth; i++){
+				for(let j=0; j < columnWidth; j++){
 					
-					var x1 = parseInt(x+((i-1)*columnWidth)+j)	
+					var x1 = parseInt(x + ((i-1) * columnWidth) + j)	
 					
 					// compare current line with distance to zbuffer to decide if it's drawn
 					if(zBuffer[x1] > this.distance){
-						ctx.drawImage(this.image,i,0,1,texturePixelHeight-1,x1,y1,1,textureHeight)
+						ctx.drawImage(this.image, i, 0, 1, texturePixelHeight-1, x1, y1, 1, textureHeight)
 					}
 				}
 			}	
