@@ -50,10 +50,7 @@ document.addEventListener('keydown', (event) => {
 		case "d":
 			player.rotateCameraRight()
 		break
-		
-
 	}
-
 })
 
 document.addEventListener('keyup', (event) => {
@@ -173,15 +170,13 @@ class Ray {
 		
 		this.ctx = context
 		this.scenario = scenario
-  
-		
+
 		this.x = x
 		this.y = y
 		
 		this.angleIncrement = angleIncrement
 		this.playerAngle = playerAngle
 		this.angle = playerAngle + angleIncrement
-		
 		
 		this.wallHitX =0
 		this.wallHitY = 0
@@ -193,10 +188,8 @@ class Ray {
 		this.wallHitXVertical = 0
 		this.wallHitYVertical = 0
 		
-		
 		this.column = column
 		this.distance = 0
-		
 		
 		this.pixelTexture = 0
 		this.textureId = 0
@@ -211,7 +204,6 @@ class Ray {
 		this.angle = normalizeAngle(angle + this.angleIncrement)
 	}
 	
-	
 	cast(){
 		
 		this.xIntercept = 0
@@ -222,7 +214,6 @@ class Ray {
 		
 		this.moveBackwards = false
 		this.rotateCameraLeft = false
-		
 		
 		if(this.angle < Math.PI)
 		  this.moveBackwards = true
@@ -274,7 +265,7 @@ class Ray {
 			}
 		}
 									
-		var choqueVertical = false
+		var verticalCollision = false
 		
 		this.xIntercept = Math.floor(this.x / tileSize) * tileSize
 
@@ -302,31 +293,31 @@ class Ray {
 		
 		//add or remove extra pixel for intersection of squares
 		
-		var siguienteXVertical = this.xIntercept
-		var siguienteYVertical = this.yIntercept
+		var nextVerticalX = this.xIntercept
+		var nextVerticalY = this.yIntercept
 		
 		
 		// if aiming toward rotateCameraLeft, add extra pixel
 		if(this.rotateCameraLeft)
-			siguienteXVertical--
+			nextVerticalX--
 
 
 		// look for collision point
-		while(!choqueVertical && (siguienteXVertical>=0 && siguienteYVertical>=0 && siguienteXVertical <canvasWidth && siguienteYVertical <canvasHeight)){
+		while(!verticalCollision && (nextVerticalX>=0 && nextVerticalY>=0 && nextVerticalX <canvasWidth && nextVerticalY <canvasHeight)){
 			
 			// get current square (round by moveBackwards)
-			var tilePosX = parseInt(siguienteXVertical/tileSize)		
-			var tilePosY = parseInt(siguienteYVertical/tileSize)		
+			var tilePosX = parseInt(nextVerticalX/tileSize)		
+			var tilePosY = parseInt(nextVerticalY/tileSize)		
 			
 			
 			if(this.scenario.collision(tilePosX,tilePosY)){
-				choqueVertical = true
-				this.wallHitXVertical = siguienteXVertical
-				this.wallHitYVertical = siguienteYVertical
+				verticalCollision = true
+				this.wallHitXVertical = nextVerticalX
+				this.wallHitYVertical = nextVerticalY
 			}
 			else{
-				siguienteXVertical += this.xStep
-				siguienteYVertical += this.yStep
+				nextVerticalX += this.xStep
+				nextVerticalY += this.yStep
 			}
 		}		
 		
@@ -338,7 +329,7 @@ class Ray {
 			distanceHorizontal = lineSegment(this.x, this.y, this.wallHitXHorizontal, this.wallHitYHorizontal)
 		}
 		
-		if(choqueVertical){
+		if(verticalCollision){
 			distanceVertical = lineSegment(this.x, this.y, this.wallHitXVertical, this.wallHitYVertical)
 		}
 		
@@ -347,8 +338,8 @@ class Ray {
 			this.wallHitY = this.wallHitYHorizontal
 			this.distance = distanceHorizontal
 			
-			var casilla = parseInt(this.wallHitX / tileSize)
-			this.pixelTexture = this.wallHitX - (casilla * tileSize)
+			var square = parseInt(this.wallHitX / tileSize)
+			this.pixelTexture = this.wallHitX - (square * tileSize)
 			
 			this.textureId = this.scenario.tile(this.wallHitX, this.wallHitY)
 		}
@@ -357,8 +348,8 @@ class Ray {
 			this.wallHitY = this.wallHitYVertical
 			this.distance = distanceVertical
 			
-			var casilla = parseInt(this.wallHitY / tileSize) * tileSize
-			this.pixelTexture = this.wallHitY - casilla
+			var square = parseInt(this.wallHitY / tileSize) * tileSize
+			this.pixelTexture = this.wallHitY - square
 			
 			this.textureId = this.scenario.tile(this.wallHitX, this.wallHitY)
 		}
