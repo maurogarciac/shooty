@@ -9,6 +9,8 @@ export class Player {
 		
 		this.ctx = context
 		this.scenario = scenario
+
+		this.crosshair = {x: 0, y: 0}
   
 		this.x = x
 		this.y = y
@@ -23,10 +25,9 @@ export class Player {
 		
 		
 		// first person renderer
-		this.numRays = main.canvasWidth	            // amount of rays casted (same as canvas width)
+		this.numRays = 60         				    // amount of rays casted
 		this.rays = []    		                    // array of rays
 
-		console.log(main.canvasWidth)
 		// calculating the rays' angles	
 		var angleIncrement	 = radianConvert(main.FOV / this.numRays)
 		var initialAngle 	 = radianConvert(this.rotationAngle - (main.FOV / 2))
@@ -46,22 +47,28 @@ export class Player {
 
 	moveForward(){
 		console.log("move up")
-		this.move = 1
+		this.move.y = 1
 	}
 	
 	moveBackwards(){
 		console.log("move down")
-		this.move = -1
+		this.move.y = -1
+	}
+
+	moveLeft(){
+		console.log("move up")
+		this.move.x = -1
 	}
 	
-	rotateCameraRight(){
-		console.log("move right")
-		this.rotate = 1
+	moveRight(){
+		console.log("move down")
+		this.move.x = 1
 	}
-	
-	rotateCameraLeft(){
-		console.log("move left")
-		this.rotate = -1
+
+
+	aim(ch){
+		this.crosshair.x = ch.x 
+		this.crosshair.y = ch.y
 	}
 	
 	stopMoving(){
@@ -91,14 +98,6 @@ export class Player {
 	}
 	
 	update(){
-
-        // rotate
-		this.rotationAngle += this.rotate * this.rotationSpeed
-        // console.log("rotationAngle: " + this.rotationAngle)
-		this.rotationAngle = normalizeAngle(this.rotationAngle)
-        // console.log("rotationAngle: " + this.rotationAngle)
-        
-
 
 		// movement logic
         var newX = this.x + this.move * Math.cos(this.rotationAngle) * this.movementSpeed
@@ -131,20 +130,43 @@ export class Player {
 			this.rays[i].draw()
 		}
 
+		// draw crosshair idk
+		this.ctx.save()
+		this.ctx.beginPath()
+		this.ctx.arc(this.crosshair.x, this.crosshair.y, 7, 0, 2 * Math.PI)
+		this.ctx.strokeStyle = "yellow"
+		this.ctx.lineWidth = 1
+		this.ctx.stroke()
+		this.ctx.restore()
+
+        //this.ctx.fillRect(this.crosshair.x - 2, this.crosshair.y - 2, 4, 4)
+		this.ctx.save()
+		this.ctx.fillStyle = "yellow" 
+		this.ctx.fillRect(this.crosshair.x - 7, this.crosshair.y - 1, 14, 2)
+		this.ctx.fillRect(this.crosshair.x - 1, this.crosshair.y - 7, 2, 14)
+		this.ctx.restore()
+
         // white player circle
-        this.ctx.fillStyle = "#FFFFFF" 
+		this.ctx.save()
+        this.ctx.fillStyle = "white" 
         this.ctx.fillRect(this.x - 3, this.y - 3, 6, 6)  // 6x6 rectangle centered on player 0 axis
         
         
         // line parallel to player camera
-        var xDestination = this.x + Math.cos(this.rotationAngle) * 40
-        var yDestination = this.y + Math.sin(this.rotationAngle) * 40
+
+		let angle = Math.atan2(this.crosshair.y - this.y, this.crosshair.x - this.x);
+		let len = 40 
+		
+		var xPointer = this.x + Math.cos(angle) * len
+        var yPointer = this.y + Math.sin(angle) * len
         
+
         this.ctx.beginPath()
         this.ctx.moveTo(this.x, this.y)
-        this.ctx.lineTo(xDestination, yDestination)
-        this.ctx.strokeStyle = "#FFFFFF"
+        this.ctx.lineTo(xPointer, yPointer)
+        this.ctx.strokeStyle = "white"
         this.ctx.stroke()
+		this.ctx.restore()
 
 	}
 }

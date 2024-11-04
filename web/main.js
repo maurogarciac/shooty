@@ -4,7 +4,8 @@ import {Player} from "./player.js"
 var canvas, 
 	ctx, 
 	scenario, 
-	player
+	player,
+	crosshair = {x: 0, y: 0}
 
 const FPS = 50,
 	FOV = 60,
@@ -12,6 +13,16 @@ const FPS = 50,
 	canvasWidth = 900
 
 // Match keyboard events
+
+document.addEventListener('mousemove', (event) => {
+
+	const rect = canvas.getBoundingClientRect();
+    crosshair.x = event.clientX - rect.left;
+    crosshair.y = event.clientY - rect.top;
+
+	player.aim(crosshair)
+	
+});
 
 document.addEventListener('keydown', (event) => {
 
@@ -22,7 +33,7 @@ document.addEventListener('keydown', (event) => {
 		break
 
 		case "a":
-			player.rotateCameraLeft()
+			player.moveLeft()
 		break
 				
 		case "s":
@@ -30,7 +41,7 @@ document.addEventListener('keydown', (event) => {
 		break
 		
 		case "d":
-			player.rotateCameraRight()
+			player.moveRight()
 		break
 	}
 })
@@ -48,11 +59,11 @@ document.addEventListener('keyup', (event) => {
 		break
 
 		case "a":
-			player.stopTurning()
+			player.stopMoving()
 		break
 
 		case "d":
-			player.stopTurning()
+			player.stopMoving()
 		break
 	}
 })
