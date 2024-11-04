@@ -5,11 +5,17 @@
         <title>Shooty</title>
         <link rel="stylesheet" href="style.css" />
         <script src="https://cdn.socket.io/4.7.5/socket.io.msgpack.min.js"></script>
+        <!-- <script type="module" src="main.js"></script> -->
+
     </head>
 
-    <body onload='init()'>
+    <body>
         <main>
             <div id="game-wrapper">
+                <script type="module">
+                    import { init } from './main.js'
+                    init()
+                </script>
                 <canvas id="game"></canvas>
             </div>
     
@@ -17,7 +23,5 @@
                 <h1>Videogmangn</h1>
             </div>
         </main>
-        
-        <script src="main.js"></script>
     </body>
 </html>
