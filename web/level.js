@@ -14,8 +14,6 @@ const map = [
 
 export class Level {
 
-	
-	
 	constructor(canvas, context){
 
 		this.tileSize = tileSize;
@@ -40,14 +38,16 @@ export class Level {
 	
 	collision(x, y){
 		var crash = false
-		// if( y < 0 || x < 0){
-		// 	console.log("value for y: " + y + "value for x: " + x)
-		// }
-		
-		if( this.matrix[y][x] != 0){
-			crash = true
+		console.log("y: " + y + " x: " + x)
+		if((y >= this.mapHeight || x >= this.mapWidth) || (y < 0 || x < 0)){
+			console.error("X or Y value outside of map grid: x=" + x + " y=" + y )
+		} else {
+			if( this.matrix[y][x] != 0){
+				crash = true
+			}
+			return crash	
 		}
-		return crash	
+		
 	}
 	
 	

@@ -29,6 +29,7 @@ main {
 #game {
   height: 100%;
   width: 100%;
+  cursor:none;
 }
 
 .title {

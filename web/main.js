@@ -29,7 +29,7 @@ document.addEventListener('keydown', (event) => {
   	switch(event.key){
 		
 		case "w":
-			player.moveForward()
+			player.moveUp()
 		break
 
 		case "a":
@@ -37,7 +37,7 @@ document.addEventListener('keydown', (event) => {
 		break
 				
 		case "s":
-			player.moveBackwards()
+			player.moveDown()
 		break
 		
 		case "d":
@@ -51,19 +51,19 @@ document.addEventListener('keyup', (event) => {
 	switch(event.key){
 		
 		case "w":
-			player.stopMoving()
+			player.stopMovingUp()
 		break
 
 		case "s":
-			player.stopMoving()
+			player.stopMovingDown()
 		break
 
 		case "a":
-			player.stopMoving()
+			player.stopMovingLeft()
 		break
 
 		case "d":
-			player.stopMoving()
+			player.stopMovingRight()
 		break
 	}
 })

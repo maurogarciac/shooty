@@ -1,4 +1,4 @@
-import main, {lineSegment, normalizeAngle} from "./main.js"
+import main, {normalizeAngle} from "./main.js"
 
 
 // ray distance

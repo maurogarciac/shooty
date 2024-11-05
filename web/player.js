@@ -1,4 +1,4 @@
-import main, {radianConvert, normalizeAngle} from "./main.js"
+import main, {radianConvert} from "./main.js"
 import {Ray} from "./rays.js"
 
 console.groupCollapsed("Player")
@@ -7,35 +7,30 @@ export class Player {
 	
 	constructor(context, scenario, x, y){
 		
-		this.ctx = context
-		this.scenario = scenario
+		this.ctx           = context
+		this.scenario      = scenario
 
-		this.crosshair = {x: 0, y: 0}
+		this.crosshair     = {x: 0, y: 0}
   
-		this.x = x
-		this.y = y
+		this.x             = x
+		this.y             = y
+		this.move          = {xpos:false, ypos:false, xneg:false, yneg:false}
 		
-		this.move = 0 	                            // -1 = behind, 1 = forward
-		this.rotate = 0 		                    // -1 = rotateCameraLeft, 1 = rotateCameraRight
+		this.rotationAngle = 0					        	// should be aiming angle later (in radians)
+		this.movementSpeed = 2
 		
-		this.rotationAngle = 0
-		
-		this.rotationSpeed = radianConvert(3) 		// 3 degrees in radians
-		this.movementSpeed = 3
-		
-		
-		// first person renderer
-		this.numRays = 60         				    // amount of rays casted
-		this.rays = []    		                    // array of rays
+		// fog of war renderer hell yeah
+		this.maxRays       = 60         				    // amount of rays casted
+		this.rays          = []    			                // array of rays
 
 		// calculating the rays' angles	
-		var angleIncrement	 = radianConvert(main.FOV / this.numRays)
-		var initialAngle 	 = radianConvert(this.rotationAngle - (main.FOV / 2))
+		var angleIncrement = radianConvert(main.FOV / this.maxRays)
+		var initialAngle   = radianConvert(this.rotationAngle - (main.FOV / 2))
 		
-		var rayAngle = initialAngle
+		var rayAngle       = initialAngle
 		
 		// creating rays
-		for(let i=0; i < this.numRays; i++){
+		for(let i=0; i < this.maxRays; i++){
 			
 			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle, i)
             
@@ -45,38 +40,45 @@ export class Player {
 
 	
 
-	moveForward(){
+	moveUp(){
 		console.log("move up")
-		this.move.y = 1
+		this.move.ypos = true
 	}
 	
-	moveBackwards(){
+	moveDown(){
 		console.log("move down")
-		this.move.y = -1
+		this.move.yneg = true
 	}
 
 	moveLeft(){
-		console.log("move up")
-		this.move.x = -1
+		console.log("move left")
+		this.move.xneg = true
 	}
 	
 	moveRight(){
-		console.log("move down")
-		this.move.x = 1
+		console.log("move right")
+		this.move.xpos = true
 	}
 
+	stopMovingUp(){
+		this.move.ypos = false
+ 	}
+
+	stopMovingDown(){
+		this.move.yneg = false
+ 	}
+
+	stopMovingLeft(){
+		this.move.xneg = false
+ 	}
+
+	stopMovingRight(){
+		this.move.xpos = false
+ 	}
 
 	aim(ch){
 		this.crosshair.x = ch.x 
 		this.crosshair.y = ch.y
-	}
-	
-	stopMoving(){
-		this.move = 0
-	}
-	
-	stopTurning(){
-		this.rotate = 0
 	}
 
 	collision(x,y){
@@ -100,17 +102,36 @@ export class Player {
 	update(){
 
 		// movement logic
-        var newX = this.x + this.move * Math.cos(this.rotationAngle) * this.movementSpeed
-		var newY = this.y + this.move * Math.sin(this.rotationAngle) * this.movementSpeed
+
+		var coords = {x: 0, y: 0}
 		
+		if (this.move.ypos) coords.y -= this.movementSpeed
+		if (this.move.yneg) coords.y += this.movementSpeed
+		if (this.move.xneg) coords.x -= this.movementSpeed
+		if (this.move.xpos) coords.x += this.movementSpeed
+		
+		// if coords are not zero, get the length of movement 
+		// by doing the square root of the sum of square roots
+		// then normalize length and scale to speed 
+		if (coords.x !== 0 && coords.y !== 0) {
+			const length = Math.sqrt(coords.x * coords.x + coords.y * coords.y)
+			coords.x /= length
+			coords.y /= length
+			coords.x *= this.movementSpeed
+			coords.y *= this.movementSpeed
+		}
+		
+		var newX = this.x + coords.x
+		var newY = this.y + coords.y
+
+		// console.log("newX: " + newX)
+		// console.log("newY: " + newY)
+		// console.log(this.move)
+
 		if(!this.collision(newX, newY)){
-            // console.log("newX: " + newX)
-            // console.log("newY: " + newY)
 			this.x = newX
 			this.y = newY
 		}
-		
-
 		
 		// update rays
 		for(let i=0; i<this.numRays; i++){
@@ -133,30 +154,31 @@ export class Player {
 		// draw crosshair idk
 		this.ctx.save()
 		this.ctx.beginPath()
-		this.ctx.arc(this.crosshair.x, this.crosshair.y, 7, 0, 2 * Math.PI)
+		this.ctx.arc(this.crosshair.x, this.crosshair.y, 8, 0, 2 * Math.PI) // cool circle
 		this.ctx.strokeStyle = "yellow"
-		this.ctx.lineWidth = 1
+		this.ctx.lineWidth = 2
 		this.ctx.stroke()
 		this.ctx.restore()
 
-        //this.ctx.fillRect(this.crosshair.x - 2, this.crosshair.y - 2, 4, 4)
 		this.ctx.save()
 		this.ctx.fillStyle = "yellow" 
-		this.ctx.fillRect(this.crosshair.x - 7, this.crosshair.y - 1, 14, 2)
-		this.ctx.fillRect(this.crosshair.x - 1, this.crosshair.y - 7, 2, 14)
+		this.ctx.fillRect(this.crosshair.x - 8, this.crosshair.y - 1, 16, 1) // vertical line
+		this.ctx.fillRect(this.crosshair.x - 1, this.crosshair.y - 8, 1, 16) // horizontal line
 		this.ctx.restore()
 
         // white player circle
 		this.ctx.save()
         this.ctx.fillStyle = "white" 
-        this.ctx.fillRect(this.x - 3, this.y - 3, 6, 6)  // 6x6 rectangle centered on player 0 axis
+        this.ctx.fillRect(this.x - 3, this.y - 3, 6, 6)  					// 6x6 rectangle centered on player 0 axis
         
         
-        // line parallel to player camera
+        // line parallel to player camera (crosshair)
+		let angle = Math.atan2(this.crosshair.y - this.y, this.crosshair.x - this.x)
 
-		let angle = Math.atan2(this.crosshair.y - this.y, this.crosshair.x - this.x);
-		let len = 40 
-		
+		// this angle can also be used to be the center of ray-casts!
+		this.rotationAngle = angle
+
+		let len = 20 
 		var xPointer = this.x + Math.cos(angle) * len
         var yPointer = this.y + Math.sin(angle) * len
         
