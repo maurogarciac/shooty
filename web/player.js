@@ -16,29 +16,21 @@ export class Player {
 		this.y             = y
 		this.move          = {xpos:false, ypos:false, xneg:false, yneg:false}
 		
-		this.rotationAngle = 0					        	// should be aiming angle later (in radians)
+		this.rotationAngle = 0					        			// should be aiming angle later (in radians)
 		this.movementSpeed = 2
 		
 		// fog of war renderer hell yeah
-		this.maxRays       = 60         				    // amount of rays casted
-		this.rays          = []    			                // array of rays
-
-		// calculating the rays' angles	
-		var angleIncrement = radianConvert(main.FOV / this.maxRays)
+		this.maxRays       = 60         				   			// amount of rays casted
+		this.rays          = []    			                		// array of rays
+		var angleIncrement = radianConvert(main.FOV / this.maxRays) // fraction of the full fov 
 		var initialAngle   = radianConvert(this.rotationAngle - (main.FOV / 2))
-		
 		var rayAngle       = initialAngle
 		
-		// creating rays
-		for(let i=0; i < this.maxRays; i++){
-			
+		for(let i=0; i < this.maxRays; i++){               			// creating each one of the rays
 			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle, i)
-            
-			rayAngle += angleIncrement
+			rayAngle += angleIncrement 								// 1 + fractional increment until full FOV is covered
 		}
 	}
-
-	
 
 	moveUp(){
 		console.log("move up")
