@@ -94,7 +94,6 @@ export class Player {
 	update(){
 
 		// movement logic
-
 		var coords = {x: 0, y: 0}
 		
 		if (this.move.ypos) coords.y -= this.movementSpeed
@@ -102,14 +101,11 @@ export class Player {
 		if (this.move.xneg) coords.x -= this.movementSpeed
 		if (this.move.xpos) coords.x += this.movementSpeed
 		
-		// if coords are not zero, get the length of movement 
-		// by doing the square root of the sum of square roots
-		// then normalize length and scale to speed 
-		if (coords.x !== 0 && coords.y !== 0) {
-			const length = Math.sqrt(coords.x * coords.x + coords.y * coords.y)
-			coords.x /= length
+		if (coords.x !== 0 && coords.y !== 0) {								    // if coords are not zero, get the length of movement
+			const length = Math.sqrt(coords.x * coords.x + coords.y * coords.y) // by doing the square root of the sum of square roots
+			coords.x /= length												    // then normalize value
 			coords.y /= length
-			coords.x *= this.movementSpeed
+			coords.x *= this.movementSpeed										// and scale to speed
 			coords.y *= this.movementSpeed
 		}
 		
@@ -126,7 +122,7 @@ export class Player {
 		}
 		
 		// update rays
-		for(let i=0; i<this.numRays; i++){
+		for(let i=0; i < this.maxRays; i++){
 			this.rays[i].x = this.x
 			this.rays[i].y = this.y
 			this.rays[i].setAngle(this.rotationAngle)
@@ -139,23 +135,23 @@ export class Player {
 		this.update()
 		
 		// draw rays
-		for(let i=0; i<this.numRays; i++){
+		for(let i=0; i < this.maxRays; i++){
 			this.rays[i].draw()
 		}
 
 		// draw crosshair idk
 		this.ctx.save()
 		this.ctx.beginPath()
-		this.ctx.arc(this.crosshair.x, this.crosshair.y, 8, 0, 2 * Math.PI) // cool circle
+		this.ctx.arc(this.crosshair.x, this.crosshair.y, 7, 0, 2 * Math.PI) // cool circle
 		this.ctx.strokeStyle = "yellow"
 		this.ctx.lineWidth = 2
 		this.ctx.stroke()
 		this.ctx.restore()
-
+		
 		this.ctx.save()
 		this.ctx.fillStyle = "yellow" 
-		this.ctx.fillRect(this.crosshair.x - 8, this.crosshair.y - 1, 16, 1) // vertical line
-		this.ctx.fillRect(this.crosshair.x - 1, this.crosshair.y - 8, 1, 16) // horizontal line
+		this.ctx.fillRect(this.crosshair.x - 7, this.crosshair.y - 1, 14, 1) // vertical line
+		this.ctx.fillRect(this.crosshair.x - 1, this.crosshair.y - 7, 1, 14) // horizontal line
 		this.ctx.restore()
 
         // white player circle

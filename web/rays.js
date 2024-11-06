@@ -8,8 +8,8 @@ export class Ray {
 	
 	constructor(context, scenario, x, y, playerAngle, angleIncrement, column){
 
-        this.rayDistanceHorizontal = 100		
-        this.rayDistanceVertical   = 100
+        this.rayLength = 400             // max length of the ray
+        this.rayStep = 5                 // step resolution of the ray (used to calculate collisions)
 		
 		this.ctx = context
 		this.scenario = scenario
@@ -22,19 +22,6 @@ export class Ray {
 		this.angleIncrement = angleIncrement
 		this.playerAngle = playerAngle
 		this.angle = playerAngle + angleIncrement
-		
-		this.wallHitX = 0
-		this.wallHitY = 0
-		
-		//these 4 zero values are all collisions 
-		
-		this.column = column
-		this.distance = 0
-		
-		this.pixelTexture = 0
-		this.textureId = 0
-		
-		this.proyectionPlaneDistance = (main.canvasWidth / 2) / Math.tan(main.FOV / 2)
 	}
 	
 	
@@ -46,19 +33,10 @@ export class Ray {
 	
 	cast(){
 		
-		this.xIntercept = 0
-		this.yIntercept = 0
-		
-		this.xStep = 0
-		this.yStep = 0
-		
-        this.wallHitX = this.x + 100
-        this.wallHitY = this.y * this.angle * 2
+        this.rayX = this.x + Math.cos(this.angle) * this.rayLength
+        this.rayY = this.y + Math.sin(this.angle) * this.rayLength
 
-		// if(this.angle > Math.PI/2 && this.angle < 3 * Math.PI / 2){
-        //     this.rotateCameraLeft = true
-        // }
-		  	
+        // I guess just take the angle value, and like uhhh
 	}
 	
 	draw(){
@@ -67,8 +45,8 @@ export class Ray {
 
 		this.ctx.save()
         this.ctx.beginPath()
-        this.ctx.moveTo(this.x, this.y)               // player location btw
-        this.ctx.lineTo(this.wallHitX, this.wallHitY) // cast a ray!
+        this.ctx.moveTo(this.x, this.y)               // start ray at player location
+        this.ctx.lineTo(this.rayX, this.rayY)         // cast the ray!
         this.ctx.strokeStyle = "lightgreen"
         this.ctx.stroke()
         this.ctx.restore()
