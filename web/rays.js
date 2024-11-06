@@ -53,19 +53,19 @@ export class Ray {
             const gridY = Math.floor(this.rayY / this.tileSize)
 
             if (gridX < 0 || gridX >= this.scenario.mapWidth || gridY < 0 || gridY >= this.scenario.mapHeight) {
-                console.log("ray out of bounds")
+                //console.log("ray out of bounds")
                 break                                        // ray is out of bounds, stop casting
             }
 
             // check for a wall collision
             if (this.map[gridY][gridX] === 1) {
-                console.log("ray collision")
+                //console.log("ray collision")
                 return                                       // draw the ray up to this collision
             }
         }
         
         // If no wall hit, draw the full ray length
-        console.log("full size ray")
+        //console.log("full size ray")
         this.rayX = this.x + dirX * this.rayLength
         this.rayY = this.y + dirY * this.rayLength
 	}

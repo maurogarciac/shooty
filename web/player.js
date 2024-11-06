@@ -5,19 +5,19 @@ console.groupCollapsed("Player")
 
 export class Player {
 	
-	constructor(context, scenario, x, y){
+	constructor(context, scenario){
 		
 		this.ctx           = context
 		this.scenario      = scenario
 
 		this.crosshair     = {x: 0, y: 0}
   
-		this.x             = x
-		this.y             = y
+		this.x             = scenario.spawn.x
+		this.y             = scenario.spawn.y
 		this.move          = {xpos:false, ypos:false, xneg:false, yneg:false}
 		
 		this.rotationAngle = 0					        			// should be aiming angle later (in radians)
-		this.movementSpeed = 2
+		this.movementSpeed = 4
 		
 		// fog of war renderer hell yeah
 		this.maxRays       = 60         				   			// amount of rays casted
@@ -33,22 +33,22 @@ export class Player {
 	}
 
 	moveUp(){
-		console.log("move up")
+		//console.log("move up")
 		this.move.ypos = true
 	}
 	
 	moveDown(){
-		console.log("move down")
+		//console.log("move down")
 		this.move.yneg = true
 	}
 
 	moveLeft(){
-		console.log("move left")
+		//console.log("move left")
 		this.move.xneg = true
 	}
 	
 	moveRight(){
-		console.log("move right")
+		//console.log("move right")
 		this.move.xpos = true
 	}
 

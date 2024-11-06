@@ -87,22 +87,16 @@ export function lineSegment(x1,y1,x2,y2){
 
 export function init(){
   
-	console.log("init started")
+	//console.log("game started")
 	canvas = document.getElementById('game')
 	ctx = canvas.getContext('2d')
-
-	// // get canvas coordinate offset from dom
-	// const bodyRect = document.body.getBoundingClientRect(),
-	// elemRect = canvas.getBoundingClientRect(),
-	// offset_top   = elemRect.top - bodyRect.top,
-	// offset_left  = elemRect.left - bodyRect.left
 
 	// set canvas size (based on values hardcoded in css)
 	canvas.width = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 
 	scenario = new Level(canvas, ctx)
-	player = new Player(ctx, scenario, 100 ,100)
+	player = new Player(ctx, scenario)
 
 	setInterval(function(){gameLoop()},1000/FPS)  // start the game loop
 
