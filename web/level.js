@@ -29,24 +29,23 @@ export class Level {
 
 		this.spawn = {x: spawnX, y: spawnY}
 		
-    	// Map dimensions
+    	// map dimensions
 		this.mapHeight  = this.matrix.length
 		this.mapWidth = this.matrix[0].length
 		
-		// Canvas dimentions
+		// canvas dimensions
 		this.canvasHeight = this.canvas.height
 		this.canvasWidth = this.canvas.width
 		
-		// Tile size
+		// tile size
 		this.tileWidth = this.tileSize
 		this.tileHeight = this.tileSize
 		
 	}
 	
-	
 	collision(x, y){
 		var crash = false
-		console.log("y: " + y + " x: " + x)
+		// console.log("y: " + y + " x: " + x)
 		if((y >= this.mapHeight || x >= this.mapWidth) || (y < 0 || x < 0)){
 			console.error("X or Y value outside of map grid: x=" + x + " y=" + y )
 		} else {
@@ -55,9 +54,7 @@ export class Level {
 			}
 			return crash	
 		}
-		
 	}
-	
 	
 	tile(x, y){
 		var tilePosX = parseInt(x / this.tileWidth)		

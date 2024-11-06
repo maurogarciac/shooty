@@ -6,10 +6,10 @@ import {normalizeAngle} from "./main.js"
 
 export class Ray {
 	
-	constructor(context, scenario, x, y, playerAngle, angleIncrement, column){
+	constructor(context, scenario, x, y, playerAngle, angleIncrement){
 
-        this.rayLength = 200             // max length of the ray
-        this.rayStep = 1                 // step resolution of the ray (used to calculate collisions)
+        this.rayLength = 200                                      // max length of the ray
+        this.rayStep = 1                                          // step resolution of the ray (used to calculate collisions)
 		
 		this.ctx = context
 		this.scenario = scenario
@@ -26,11 +26,11 @@ export class Ray {
 	}
 	
 	
-	// angle has to be normalized to prevent negative values
+	
 	setAngle(angle){
 		this.playerAngle = angle
-		this.angle = normalizeAngle(angle + this.angleIncrement)
-	}
+		this.angle = normalizeAngle(angle + this.angleIncrement)  // angle has to be normalized to prevent negative values
+	} 
 	
 	cast(){
 	
@@ -54,13 +54,13 @@ export class Ray {
 
             if (gridX < 0 || gridX >= this.scenario.mapWidth || gridY < 0 || gridY >= this.scenario.mapHeight) {
                 //console.log("ray out of bounds")
-                break                                        // ray is out of bounds, stop casting
+                break                                             // ray is out of bounds, stop casting
             }
 
             // check for a wall collision
             if (this.map[gridY][gridX] === 1) {
                 //console.log("ray collision")
-                return                                       // draw the ray up to this collision
+                return                                            // draw the ray up to this collision
             }
         }
         
@@ -76,8 +76,8 @@ export class Ray {
 
 		this.ctx.save()
         this.ctx.beginPath()
-        this.ctx.moveTo(this.x, this.y)                     // start ray at player location
-        this.ctx.lineTo(this.rayX, this.rayY)               // cast the ray!
+        this.ctx.moveTo(this.x, this.y)                         // start ray at player location
+        this.ctx.lineTo(this.rayX, this.rayY)                   // cast the ray!
         this.ctx.strokeStyle = "lightgreen"
         this.ctx.stroke()
         this.ctx.restore()

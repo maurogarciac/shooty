@@ -10,7 +10,7 @@ export class Player {
 		this.ctx           = context
 		this.scenario      = scenario
 
-		this.FOV           = 80,
+		this.FOV           = 120,
 
 		this.crosshair     = {x: 0, y: 0}
   
@@ -29,7 +29,7 @@ export class Player {
 		var rayAngle       = initialAngle
 		
 		for(let i=0; i < this.maxRays; i++){               			// creating each one of the rays
-			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle, i)
+			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle)
 			rayAngle += angleIncrement 								// current ray slope + fractional increment until full FOV is covered
 		}
 	}
