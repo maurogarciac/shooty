@@ -8,7 +8,7 @@ var canvas,
 	crosshair = {x: 0, y: 0}
 
 const FPS = 50,
-	FOV = 60,
+	FOV = 80,
 	canvasHeight = 600, 
 	canvasWidth = 900
 
