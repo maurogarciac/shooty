@@ -5,12 +5,11 @@ var canvas,
 	ctx, 
 	scenario, 
 	player,
-	crosshair = {x: 0, y: 0}
+	crosshair    = {x: 0, y: 0}
 
-const FPS = 50,
-	FOV = 80,
+const FPS        = 50,
 	canvasHeight = 600, 
-	canvasWidth = 900
+	canvasWidth  = 900
 
 // Match keyboard events
 
@@ -89,21 +88,21 @@ export function init(){
   
 	//console.log("game started")
 	canvas = document.getElementById('game')
-	ctx = canvas.getContext('2d')
+	ctx    = canvas.getContext('2d')
 
 	// set canvas size (based on values hardcoded in css)
-	canvas.width = canvas.clientWidth
+	canvas.width  = canvas.clientWidth
 	canvas.height = canvas.clientHeight
 
 	scenario = new Level(canvas, ctx)
-	player = new Player(ctx, scenario)
+	player   = new Player(ctx, scenario)
 
 	setInterval(function(){gameLoop()},1000/FPS)  // start the game loop
 
 }
 
 function clearCanvas(){
-	canvas.width = canvas.width
+	canvas.width  = canvas.width
 	canvas.height = canvas.height
 }
 
@@ -117,5 +116,4 @@ function gameLoop(){
 export default {
 	canvasWidth,
 	canvasHeight,
-	FOV
 }

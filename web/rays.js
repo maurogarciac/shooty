@@ -1,4 +1,4 @@
-import main, {normalizeAngle} from "./main.js"
+import {normalizeAngle} from "./main.js"
 
 
 // ray distance

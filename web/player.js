@@ -1,4 +1,4 @@
-import main, {radianConvert} from "./main.js"
+import {radianConvert} from "./main.js"
 import {Ray} from "./rays.js"
 
 console.groupCollapsed("Player")
@@ -9,6 +9,8 @@ export class Player {
 		
 		this.ctx           = context
 		this.scenario      = scenario
+
+		this.FOV           = 80,
 
 		this.crosshair     = {x: 0, y: 0}
   
@@ -22,13 +24,13 @@ export class Player {
 		// fog of war renderer hell yeah
 		this.maxRays       = 60         				   			// amount of rays casted
 		this.rays          = []    			                		// array of rays
-		var angleIncrement = radianConvert(main.FOV / this.maxRays) // fraction of the full fov 
-		var initialAngle   = radianConvert(this.rotationAngle - (main.FOV / 2))
+		var angleIncrement = radianConvert(this.FOV / this.maxRays) // fraction of the full fov 
+		var initialAngle   = radianConvert(this.rotationAngle - (this.FOV / 2))
 		var rayAngle       = initialAngle
 		
 		for(let i=0; i < this.maxRays; i++){               			// creating each one of the rays
 			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle, i)
-			rayAngle += angleIncrement 								// 1 + fractional increment until full FOV is covered
+			rayAngle += angleIncrement 								// current ray slope + fractional increment until full FOV is covered
 		}
 	}
 
