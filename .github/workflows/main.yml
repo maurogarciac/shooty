@@ -1,0 +1,38 @@
+name: Formatter
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Add nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install js-beautify
+        run: |
+          npm install -g js-beautify
+
+      - name: Format js files
+        run: |
+          for file in $(find . -type f -name '*.js'); do
+            js-beautify --indent-size 2 --max-preserve-newlines 2 -r "$file"
+          done
+
+      - name: Commit changes
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "actions@github.com"
+          git add .
+          git commit -m "auto-format and align comments" || echo "no changes to commit"
+        shell: bash
