@@ -1,3 +1,4 @@
+// import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
 import {Level} from "./level.js"
 import {Player} from "./player.js"
 
@@ -7,7 +8,15 @@ var canvas,
 	player,
 	crosshair    = {x: 0, y: 0}
 
-const FPS        = 50,
+const socket     = io(
+	"ws://localhost:4269/", {
+	protocol: "echo-protocol",	 
+	transports: ["websocket"], 
+	reconnection: false,
+    //reconnectionAttempts: 5,
+    //reconnectionDelay: 1000 
+	}),
+	FPS          = 50,
 	canvasHeight = 600, 
 	canvasWidth  = 900
 
@@ -28,6 +37,8 @@ document.addEventListener('keydown', (event) => {
   	switch(event.key){
 		
 		case "w":
+			socket.emit("action", "hiii")
+			console.log("moveup")
 			player.moveUp()
 		break
 
@@ -85,6 +96,28 @@ export function lineSegment(x1,y1,x2,y2){
 } 
 
 export function init(){
+
+	console.log("init started")
+	socket.on("tick", (data) => {
+		console.log(data)
+	})
+
+	socket.on("connect", () => {
+		console.log("connected");
+	})
+
+	socket.on("disconnect", (reason, details) => {
+		console.log(reason);
+
+		// the low-level reason of the disconnection, for example "xhr post error"
+		console.log(details.message);
+	  
+		// some additional description, for example the status code of the HTTP response
+		console.log(details.description);
+	  
+		// some additional context, for example the XMLHttpRequest object
+		console.log(details.context);
+	})
   
 	//console.log("game started")
 	canvas        = document.getElementById('game')
@@ -108,7 +141,7 @@ function clearCanvas(){
 
 function gameLoop(){
 	clearCanvas()
-	
+
 	scenario.draw()
 	player.draw()
 }
