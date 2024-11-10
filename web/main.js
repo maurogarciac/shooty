@@ -106,6 +106,11 @@ export function init(){
 		console.log("connected");
 	})
 
+
+	socket.on("gameinfo", (data) => {
+		console.log(data)
+	})
+
 	socket.on("disconnect", (reason, details) => {
 		console.log(reason);
 
