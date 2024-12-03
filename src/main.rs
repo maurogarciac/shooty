@@ -10,7 +10,7 @@ use level::{BitVectorMap, Level, Coordinates};
 use serde_json::json;
 use rmpv::Value;
 use socketioxide::{
-    extract::{Data, SocketRef}, layer::SocketIoLayer, ParserConfig, SocketIo
+    extract::{Data, SocketRef}, layer::SocketIoLayer, socket::DisconnectReason, DisconnectError, ParserConfig, SocketIo
 };
 use tokio::net::TcpListener;
 use tower::ServiceBuilder;
@@ -23,7 +23,7 @@ use std::sync::{Arc, Mutex};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
-    let filter: EnvFilter = EnvFilter::builder().with_default_directive(LevelFilter::DEBUG.into()).from_env_lossy();
+    let filter: EnvFilter = EnvFilter::builder().with_default_directive(LevelFilter::INFO.into()).from_env_lossy();
     tracing_subscriber::registry() // supalogging memes
         .with(fmt::layer())
         .with(filter)
@@ -31,11 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Starting server");
 
-    let (layer, io): (SocketIoLayer, SocketIo) = SocketIo::builder()
-        .with_parser(ParserConfig::msgpack())
-        .build_layer();
-
-    // define gameloop here?
+    // game logic stuff
     let map: Vec<u64> = vec![
         11111111111111,  
         10000000000111, 
@@ -60,37 +56,41 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let spawn_points: [Coordinates; 5] = [Coordinates{x:5, y:5}, Coordinates{x:5, y:5}, Coordinates{x:5, y:5}, Coordinates{x:5, y:5}, Coordinates{x:5, y:5}];
     let scenario: Level = Level::new(bvmap, 30, spawn_points);
     let game: Arc<Mutex<Game>> = Arc::new(Mutex::new(Game::new(scenario)));
+
+
+    // i don't really understand how this could work if I'm cloning the game 
+    // because it's literally a different game but whatever maybe uhh
     let game_clone: Arc<Mutex<Game>> = Arc::clone(&game);
+    
+    let mut game_connect: Arc<Mutex<Game>> = Arc::clone(&game_clone);
+    let mut game_disconnect: Arc<Mutex<Game>> = Arc::clone(&game_clone);
+
     tokio::spawn(async move {
         game_clone.lock().unwrap().init();
     });
-    
+
+    // websocket stuff (socket-io of course)
+    let (layer, io): (SocketIoLayer, SocketIo) = SocketIo::builder()
+        .with_parser(ParserConfig::msgpack())
+        .build_layer();
+
     info!("SocketNs???");
     io.ns("/", move |s: SocketRef| {
 
-        info!("sockt: {}", s.id);
+        info!("start socket: {}", s.id);
 
         s.on("connect", {
             info!("Client connected with id: {}", s.id);
             move |s: SocketRef| {
-                let game = Arc::clone(&game);
-                let mut game_lock = game.lock().unwrap();
+                
+                let mut conn_game = game_connect.lock().unwrap();
                 let player: Player = Player::new(s.id, Coordinates{x:35,y:35}, 5);
-                game_lock.join(player);
-                // update game's player list via fn "join"
+                conn_game.join(player);
+                // update game's player list via fn "join"  
                 // send to server info to new player
                 // server info: map, idk
                 let data = json!({"map": &map_clone, "game": "uhh"});
-                s.broadcast().emit("gameinfo", &data).unwrap();
-            }
-        });
-
-        s.on("disconnect", {
-            warn!("Client disconnected, id: {:?}", s.id);
-            move |s: SocketRef| {
-                // let game = Arc::clone(&game);
-                // let mut game_lock = game.lock().unwrap();
-                // game_lock.disconnect(s.id);
+                s.emit("gameinfo", &data).unwrap();
             }
         });
 
@@ -98,10 +98,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             info!("action");
             move |s: SocketRef, Data::<Value>(data)| {
                 // send player pos and angle to the game loop
-                info!("socket-id: {}, data: {}", s.id, data);
-                s.broadcast().emit("tick", "{'msg':'Hiii'}").unwrap();
+                //info!("action socket-id: {}, data: {}", s.id, data);
+               
+                s.emit("received", &format!("{{'msg':'{data}'}}")).unwrap();
                 }
         });
+
+        s.on_disconnect({
+            warn!("Client disconnected, id: {:?}", s.id);
+            move |s: SocketRef, reason: DisconnectReason| {
+                info!("Socket disconnected on {} namespace with id and reason: {} {}", s.ns(), s.id, reason);
+
+                let mut game_lock = game_disconnect.lock().unwrap();
+                game_lock.disconnect(s.id);
+            }
+        });
+
+
     });
 
     info!("Serving btw");

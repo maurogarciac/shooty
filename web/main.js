@@ -10,13 +10,14 @@ var canvas,
 
 const socket     = io(
 	"ws://localhost:4269/", {
-	protocol: "echo-protocol",	 
+	// protocol: "echo-protocol",	 
 	transports: ["websocket"], 
-	reconnection: false,
-    //reconnectionAttempts: 5,
-    //reconnectionDelay: 1000 
+	// reconnection: true,
+	// upgrade: false,
+    // reconnectionAttempts: 5,a
+    // reconnectionDelay: 1000 
 	}),
-	FPS          = 50,
+	FPS          = 60,
 	canvasHeight = 600, 
 	canvasWidth  = 900
 
@@ -37,20 +38,26 @@ document.addEventListener('keydown', (event) => {
   	switch(event.key){
 		
 		case "w":
-			socket.emit("action", "hiii")
+			socket.emit("action", "moveup")
 			console.log("moveup")
 			player.moveUp()
 		break
 
 		case "a":
+			socket.emit("action", "moveleft")
+			console.log("moveleft")
 			player.moveLeft()
 		break
 				
 		case "s":
+			socket.emit("action", "movedown")
+			console.log("movedown")
 			player.moveDown()
 		break
 		
 		case "d":
+			socket.emit("action", "moveright")
+			console.log("moveright")
 			player.moveRight()
 		break
 	}
@@ -104,6 +111,11 @@ export function init(){
 
 	socket.on("connect", () => {
 		console.log("connected");
+	})
+
+	
+	socket.on("received", (data) => {
+		console.log('received' + data)
 	})
 
 
