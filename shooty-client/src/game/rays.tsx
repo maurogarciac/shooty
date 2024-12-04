@@ -1,14 +1,11 @@
 import { Level } from "./level.tsx"
-import { normalizeAngle } from "./App.tsx"
-
-
-// ray distance
+import { normalizeAngle } from "../App.tsx"
 
 
 export class Ray {
 	
 
-    rayLength: number                                        // max length of the ray
+    rayMaxLength: number                                        // max length of the ray
     rayStep: number                                          // step resolution of the ray (used to calculate collisions)
     ctx: CanvasRenderingContext2D
     scenario: Level
@@ -26,7 +23,7 @@ export class Ray {
 
 	constructor(context: CanvasRenderingContext2D, scenario: Level, x: number, y: number, playerAngle: number, angleIncrement: number){
 
-        this.rayLength = 200
+        this.rayMaxLength = 200
         this.rayStep = 1
 		
 		this.ctx = context
@@ -63,7 +60,7 @@ export class Ray {
         this.rayY = this.y
     
         // cast the ray (step by step)
-        for (let i = 0; i <= this.rayLength; i += this.rayStep) {
+        for (let i = 0; i <= this.rayMaxLength; i += this.rayStep) {
 
             // move the ray one step in the direction of (dirX, dirY)
             this.rayX += this.rayStep * dirX
@@ -87,8 +84,8 @@ export class Ray {
         
         // If no wall hit, draw the full ray length
         //console.log("full size ray")
-        this.rayX = this.x + dirX * this.rayLength
-        this.rayY = this.y + dirY * this.rayLength
+        this.rayX = this.x + dirX * this.rayMaxLength
+        this.rayY = this.y + dirY * this.rayMaxLength
 	}
 	
 	draw(){

@@ -1,4 +1,4 @@
-import { radianConvert, Coordinates } from "./App.tsx"
+import { radianConvert, Coordinates } from "../App.tsx"
 import { Ray } from "./rays.tsx"
 import { Level } from "./level.tsx"
 
@@ -36,7 +36,7 @@ export class Player {
 		this.move          = {xpos:false, ypos:false, xneg:false, yneg:false}
 		
 		this.rotationAngle = 0					        			// should be aiming angle later (in radians)
-		this.movementSpeed = 4
+		this.movementSpeed = 3
 		
 		// fog of war renderer hell yeah
 		this.maxRays       = 60         				   			// amount of rays casted
@@ -87,9 +87,23 @@ export class Player {
 		this.move.xpos = false
  	}
 
-	aim(ch: {[key: string]: number}){
+	aim(ch: Coordinates){
 		this.crosshair.x = ch.x 
 		this.crosshair.y = ch.y
+	}
+
+	shoot() {
+
+		let bullet: Ray = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, 0)
+
+		bullet.draw()
+		// this.ctx.beginPath()
+        // this.ctx.moveTo(this.x, this.y)
+        // this.ctx.lineTo(this.crosshair.x, this.crosshair.y)
+        // this.ctx.strokeStyle = "red"
+
+        // this.ctx.stroke()
+		// this.ctx.restore()
 	}
 
 	collision(x: number,y: number){
@@ -97,8 +111,8 @@ export class Player {
 		var crash = false
 
 		// get coordinates of player's current square
-		var tilePosX = x / this.scenario.tileWidth
-		var tilePosY = y / this.scenario.tileHeight        
+		var tilePosX = Math.round(x) / this.scenario.tileWidth
+		var tilePosY = Math.round(y) / this.scenario.tileHeight        
 
         // console.log("player:collisionTilePosX: " + tilePosX)
         // console.log("player:collisionTilePosY: " + tilePosY)

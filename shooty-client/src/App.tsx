@@ -1,8 +1,8 @@
 import './App.css'
 
 import { io, Socket } from "socket.io-client"
-import { Level } from "./level.tsx"
-import { Player } from "./player.tsx"
+import { Level } from "./game/level.tsx"
+import { Player } from "./game/player.tsx"
 
 
 export type Coordinates = {[key: string]: number}
@@ -156,6 +156,11 @@ function init(){
 		
 	});
 
+	document.addEventListener('click', () => {
+		player.shoot()
+		
+	});
+
 	setInterval(function(){gameLoop()},1000/FPS)  // start the game loop
 }
 
@@ -186,7 +191,7 @@ function App() {
           </div>
   
           <div id="title">
-              <h1>Videogmangn</h1>
+              <h1>Shooty! (kill the red guys)</h1>
           </div>
       </main>
     </>
