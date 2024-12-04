@@ -2,29 +2,35 @@ import { Level } from "./level.tsx"
 import { normalizeAngle } from "../App.tsx"
 
 
+export type RayProperties = {}
+
+
 export class Ray {
 	
 
-    rayMaxLength: number                                        // max length of the ray
+    rayMaxLength: number = 200                               // max length of the ray
     rayStep: number                                          // step resolution of the ray (used to calculate collisions)
+    rayColor: string
     ctx: CanvasRenderingContext2D
     scenario: Level
     map: number[][]
     tileSize: number
     x: number
     y: number
+
     angleIncrement: number
-    playerAngle: number
     angle: number
 
     rayX: number
     rayY: number
 
 
-	constructor(context: CanvasRenderingContext2D, scenario: Level, x: number, y: number, playerAngle: number, angleIncrement: number){
+	constructor(context: CanvasRenderingContext2D, scenario: Level, x: number, y: number, playerAngle: number, rayAngle: number, rayMaxLength: number, color:string){
 
-        this.rayMaxLength = 200
+        this.rayMaxLength = rayMaxLength
         this.rayStep = 1
+
+        this.rayColor = color 
 		
 		this.ctx = context
 		this.scenario = scenario
@@ -38,18 +44,20 @@ export class Ray {
         this.rayX = this.x
         this.rayY = this.y
 		
-		this.angleIncrement = angleIncrement
-		this.playerAngle = playerAngle
-		this.angle = playerAngle + angleIncrement
+        this.angle = rayAngle
+
+        this.angleIncrement = rayAngle - playerAngle
+		
 	}
-	
-	
-	
-	setAngle(angle: number){
-		this.playerAngle = angle
-		this.angle = normalizeAngle(angle + this.angleIncrement)  // angle has to be normalized to prevent negative values
-	} 
-	
+
+    	
+	setAngle(playerAngle: number){
+        // let angleDiff = normalizeAngle(playerAngle - this.angle)
+        let angleDiff = normalizeAngle(playerAngle + this.angleIncrement)
+
+		this.angle = angleDiff - 1  // angle has to be normalized to prevent negative values
+    }
+
 	cast(){
 	
         // get the ray's direction
@@ -96,7 +104,7 @@ export class Ray {
         this.ctx.beginPath()
         this.ctx.moveTo(this.x, this.y)                         // start ray at player location
         this.ctx.lineTo(this.rayX, this.rayY)                   // cast the ray!
-        this.ctx.strokeStyle = "lightgreen"
+        this.ctx.strokeStyle = this.rayColor
         this.ctx.stroke()
         this.ctx.restore()
 	}

@@ -1,4 +1,4 @@
-import { radianConvert, Coordinates } from "../App.tsx"
+import { normalizeAngle, radianConvert, Coordinates } from "../App.tsx"
 import { Ray } from "./rays.tsx"
 import { Level } from "./level.tsx"
 
@@ -15,6 +15,8 @@ export class Player {
     move: {[key: string]: boolean}
     rotationAngle: number				        			  // should be aiming angle later (in radians)
     movementSpeed: number
+
+	directionAngle: number
 
     // fog of war renderer hell yeah
     maxRays: number               				   			  // amount of rays casted
@@ -41,12 +43,14 @@ export class Player {
 		// fog of war renderer hell yeah
 		this.maxRays       = 60         				   			// amount of rays casted
 		this.rays          = []    			                		// array of rays
+
+		this.directionAngle   = radianConvert(this.rotationAngle - (this.FOV / 2)) // player's angle of direction
 		var angleIncrement = radianConvert(this.FOV / this.maxRays) // fraction of the full fov 
-		var initialAngle   = radianConvert(this.rotationAngle - (this.FOV / 2))
-		var rayAngle       = initialAngle
+		var rayAngle       = this.directionAngle
 		
 		for(let i=0; i < this.maxRays; i++){               			// creating each one of the rays
-			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, rayAngle)
+			let currentAngle = normalizeAngle(rayAngle + this.rotationAngle)
+			this.rays[i] = new Ray(this.ctx, this.scenario, this.x, this.y, this.directionAngle, currentAngle, 200, "lightgreen")
 			rayAngle += angleIncrement 								// current ray slope + fractional increment until full FOV is covered
 		}
 	}
@@ -93,17 +97,9 @@ export class Player {
 	}
 
 	shoot() {
-
-		let bullet: Ray = new Ray(this.ctx, this.scenario, this.x, this.y, this.rotationAngle, 0)
-
+		let bullet: Ray = new Ray(this.ctx, this.scenario, this.x, this.y, this.directionAngle, this.rotationAngle, 500, "red")
+		console.log("player angle: %s, rotation angle: %s", this.directionAngle, this.rotationAngle)
 		bullet.draw()
-		// this.ctx.beginPath()
-        // this.ctx.moveTo(this.x, this.y)
-        // this.ctx.lineTo(this.crosshair.x, this.crosshair.y)
-        // this.ctx.strokeStyle = "red"
-
-        // this.ctx.stroke()
-		// this.ctx.restore()
 	}
 
 	collision(x: number,y: number){
