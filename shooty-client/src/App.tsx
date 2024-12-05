@@ -1,12 +1,17 @@
-// import {io} from "https://cdn.socket.io/4.8.0/socket.io.esm.min.js";
-import {Level} from "./level.js"
-import {Player} from "./player.js"
+import './App.css'
 
-var canvas, 
-	ctx, 
-	scenario, 
-	player,
-	crosshair    = {x: 0, y: 0}
+import { io, Socket } from "socket.io-client"
+import { Level } from "./game/level.tsx"
+import { Player } from "./game/player.tsx"
+
+
+export type Coordinates = {[key: string]: number}
+
+var canvas: HTMLCanvasElement, 
+	ctx: CanvasRenderingContext2D, 
+	scenario: Level, 
+	player: Player,
+	crosshair: Coordinates = {x: 0, y: 0}
 
 const socket     = io(
 	"ws://localhost:4269/", {
@@ -17,21 +22,12 @@ const socket     = io(
     // reconnectionAttempts: 5,a
     // reconnectionDelay: 1000 
 	}),
-	FPS          = 60,
-	canvasHeight = 600, 
-	canvasWidth  = 900
+	FPS          = 60
+
+	export const canvasHeight = 600,
+	  canvasWidth  = 900
 
 // Match keyboard events
-
-document.addEventListener('mousemove', (event) => {
-
-	const rect = canvas.getBoundingClientRect();
-    crosshair.x = event.clientX - rect.left;
-    crosshair.y = event.clientY - rect.top;
-
-	player.aim(crosshair)
-	
-});
 
 document.addEventListener('keydown', (event) => {
 
@@ -66,7 +62,7 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keyup', (event) => {
 
 	switch(event.key){
-		
+
 		case "w":
 			player.stopMovingUp()
 		break
@@ -85,7 +81,7 @@ document.addEventListener('keyup', (event) => {
 	}
 })
 
-export function normalizeAngle(angle){
+export function normalizeAngle(angle: number) : number {
 	angle = angle % (2 * Math.PI)
 	if(angle < 0){
 		angle = (2 * Math.PI) + angle	// if it's negative, turn around
@@ -93,16 +89,16 @@ export function normalizeAngle(angle){
 	return angle
 }
 
-export function radianConvert(angle){
+export function radianConvert(angle: number): number{
 	angle = angle * (Math.PI / 180)
 	return angle
 }
 
-export function lineSegment(x1,y1,x2,y2){
+export function lineSegment(x1: number,y1: number,x2: number,y2: number): number{
 	return Math.sqrt((x2 - x1) * (x2 - x1) + (y2-y1)*(y2-y1))
 } 
 
-export function init(){
+function init(){
 
 	console.log("init started")
 	socket.on("tick", (data) => {
@@ -123,22 +119,25 @@ export function init(){
 		console.log(data)
 	})
 
-	socket.on("disconnect", (reason, details) => {
+	socket.on("disconnect", (reason: Socket.DisconnectReason, details) => {
 		console.log(reason);
 
-		// the low-level reason of the disconnection, for example "xhr post error"
-		console.log(details.message);
-	  
-		// some additional description, for example the status code of the HTTP response
-		console.log(details.description);
-	  
-		// some additional context, for example the XMLHttpRequest object
-		console.log(details.context);
+    if (details === undefined) {
+      console.log("disconnect details are undefined")
+    } else {
+      console.log(details);
+    }
 	})
   
 	//console.log("game started")
-	canvas        = document.getElementById('game')
-	ctx           = canvas.getContext('2d')
+  let getCanvas = document.getElementById('game')
+  if(getCanvas !== null && getCanvas instanceof HTMLCanvasElement) {
+    canvas = getCanvas
+    let getContext = canvas.getContext('2d')
+    if(getContext !== null && getContext instanceof CanvasRenderingContext2D) {
+    ctx = getContext
+    }
+  }
 
 	// set canvas size (based on values hardcoded in css)
 	canvas.width  = canvas.clientWidth
@@ -147,8 +146,22 @@ export function init(){
 	scenario      = new Level(canvas, ctx)
 	player        = new Player(ctx, scenario)
 
-	setInterval(function(){gameLoop()},1000/FPS)  // start the game loop
+	document.addEventListener('mousemove', (event) => {
 
+		const rect = canvas.getBoundingClientRect();
+		crosshair.x = event.clientX - rect.left;
+		crosshair.y = event.clientY - rect.top;
+	
+		player.aim(crosshair)
+		
+	});
+
+	document.addEventListener('click', () => {
+		player.shoot()
+		
+	});
+
+	setInterval(function(){gameLoop()},1000/FPS)  // start the game loop
 }
 
 function clearCanvas(){
@@ -163,7 +176,26 @@ function gameLoop(){
 	player.draw()
 }
 
-export default {
-	canvasWidth,
-	canvasHeight,
+
+function App() {
+
+	setTimeout(() => {
+		init()
+	}) 
+		
+  return (
+    <>
+      <main>
+          <div id="game-wrapper">
+              <canvas id="game"></canvas>
+          </div>
+  
+          <div id="title">
+              <h1>Shooty! (kill the red guys)</h1>
+          </div>
+      </main>
+    </>
+  )
 }
+
+export default App
