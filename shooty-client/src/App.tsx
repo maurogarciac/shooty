@@ -116,11 +116,15 @@ function init(){
 
 
 	socket.on("gameinfo", (data) => {
-		console.log(data)
+		console.log("gameinfo: %s", data)
 	})
 
 	socket.on("disconnect", (reason: Socket.DisconnectReason, details) => {
 		console.log(reason);
+
+	socket.on("ping", () => {
+			socket.emit("pong")
+		});
 
     if (details === undefined) {
       console.log("disconnect details are undefined")

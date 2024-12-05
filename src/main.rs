@@ -12,13 +12,13 @@ use rmpv::Value;
 use socketioxide::{
     extract::{Data, SocketRef}, layer::SocketIoLayer, socket::DisconnectReason, DisconnectError, ParserConfig, SocketIo
 };
-use tokio::net::TcpListener;
-use tower::ServiceBuilder;
+use tokio::{net::TcpListener, time};
+use tower::{util::error::optional::None, ServiceBuilder};
 use tower_http::{cors::CorsLayer, services::ServeDir};
 use tracing::{info, warn};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, filter::{EnvFilter, LevelFilter}};
 
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, time::Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -91,6 +91,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // server info: map, idk
                 let data = json!({"map": &map_clone, "game": "uhh"});
                 s.emit("gameinfo", &data).unwrap();
+
+                start_heartbeat(s)
             }
         });
 
@@ -114,7 +116,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
 
-
     });
 
     info!("Serving btw");
@@ -130,4 +131,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
+}
+
+
+async fn start_heartbeat(socket: SocketRef) {
+    let interval: Duration = Duration::from_secs(10);
+
+    loop {
+        if !socket.connected() {
+            println!("Connection closed, stopping heartbeat");
+            break;
+        }
+
+        if let Err(err) = socket.emit("ping", "ping") {
+            println!("Failed to send ping: {}", err);
+            break;
+        }
+
+        println!("Ping sent");
+        time::sleep(interval).await;
+    }
 }
